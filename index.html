@@ -2,275 +2,232 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Milan Pro AI – Advanced System</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Milan Pro AI - Dual Family Pattern</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;800&display=swap" rel="stylesheet">
     <style>
-        :root { 
-            --gold: #ffd700; 
-            --blue-circle: #0084ff; 
-            --green-line: #00ff88; 
-            --bg: #0f172a; 
-            --panel: #1e293b; 
-        }
-
+        :root { --gold: #ffd700; --cyan: #00f2ff; --bg: #0f172a; --panel: #1e293b; }
         * { box-sizing: border-box; font-family: 'Poppins', sans-serif; }
-        body { margin: 0; background: var(--bg); color: #fff; overflow-x: hidden; }
+        body { margin: 0; background: var(--bg); color: #fff; }
 
-        #home-screen {
-            height: 100vh; width: 100vw; display: flex; flex-direction: column;
-            align-items: center; justify-content: center; text-align: center;
-            background: radial-gradient(circle at center, #1e293b 0%, #0f172a 100%);
-        }
-        .hero-title { font-size: 3rem; color: var(--gold); margin: 0; }
-        .enter-btn {
-            background: var(--gold); color: #000; padding: 15px 40px;
-            font-size: 1.2rem; font-weight: 800; border: none; border-radius: 50px;
-            cursor: pointer; transition: 0.3s;
-        }
+        /* App Layout */
+        #home-screen { height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; background: radial-gradient(circle, #1e293b, #0f172a); }
+        .enter-btn { background: var(--gold); border: none; padding: 15px 40px; border-radius: 50px; font-weight: 800; cursor: pointer; }
 
-        #main-app { display: none; padding: 15px; }
-        .toolbar { background: var(--panel); padding: 12px; border-radius: 12px; margin-bottom: 15px; display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; border: 1px solid rgba(255,255,255,0.1); }
+        #main-app { display: none; padding: 20px; }
+        .toolbar { display: flex; gap: 10px; justify-content: center; margin-bottom: 20px; }
+        button { padding: 10px 15px; border-radius: 5px; border: none; font-weight: bold; cursor: pointer; }
+
+        /* Table & Canvas */
+        .table-container { position: relative; background: #fff; padding: 10px; border-radius: 8px; display: inline-block; color: #000; }
+        table { border-collapse: collapse; position: relative; z-index: 5; }
+        td, th { border: 1px solid #ccc; width: 45px; height: 45px; text-align: center; font-weight: bold; }
         
-        /* Search Panel Styling */
-        .search-engine { background: #1e293b; padding: 15px; border-radius: 12px; border: 1px solid var(--gold); margin-bottom: 20px; }
-        .search-engine input { background: #0f172a; border: 1px solid #444; color: #fff; padding: 8px; border-radius: 5px; width: 80px; text-align: center; }
-        .search-btn { background: var(--gold); color: #000; border: none; padding: 8px 20px; border-radius: 5px; font-weight: bold; cursor: pointer; }
-
-        .table-container { position: relative; background: #fff; border-radius: 10px; padding: 5px; box-shadow: 0 0 30px rgba(0,0,0,0.5); display: inline-block; }
-        table { border-collapse: collapse; color: #000; font-size: 14px; position: relative; z-index: 5; }
-        td, th { border: 1px solid #ddd; padding: 8px 4px; text-align: center; font-weight: bold; width: 45px; height: 45px; }
-        th { background: #1e293b; color: white; }
-        
-        .circle { border: 3px solid var(--blue-circle) !important; border-radius: 50% !important; background: rgba(0, 132, 255, 0.15); z-index: 10; }
-        .match-highlight { background: #fff700 !important; color: #000 !important; } /* Video ki tarah highlight */
+        /* Pattern Markers */
+        .f1-mark { border: 3px solid var(--gold) !important; border-radius: 50%; background: rgba(255, 215, 0, 0.2); }
+        .f2-mark { border: 3px solid var(--cyan) !important; border-radius: 50%; background: rgba(0, 242, 255, 0.2); }
         canvas { position: absolute; top: 0; left: 0; pointer-events: none; z-index: 4; }
 
-        .dashboard { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 10px; margin-top: 20px; }
-        .card { background: var(--panel); padding: 15px; border-radius: 12px; border-top: 3px solid var(--gold); }
-        #popup { position: fixed; left: 50%; top: 50%; transform: translate(-50%, -50%); background: #fff; border-radius: 15px; display: none; z-index: 100; padding: 15px; color: #000; width: 95%; max-width: 500px; }
-        .overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); display: none; z-index: 90; }
-        button { cursor: pointer; border-radius: 6px; border: none; font-weight: bold; }
+        .dashboard { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 20px; }
+        .card { background: var(--panel); padding: 15px; border-radius: 10px; border-top: 4px solid var(--gold); }
+        
+        /* Popups */
+        .overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); display: none; z-index: 90; }
+        #popup { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: white; color: #000; padding: 20px; border-radius: 15px; display: none; z-index: 100; width: 90%; max-width: 600px; }
     </style>
 </head>
 <body>
 
 <div id="home-screen">
-    <h1 class="hero-title">Milan PRO AI</h1>
+    <h1 style="color:var(--gold); font-size: 3rem;">MILAN PRO AI</h1>
     <button class="enter-btn" onclick="startApp()">START ANALYSIS</button>
 </div>
 
 <div id="main-app">
-    <div class="search-engine">
-        <h3 style="margin:0 0 10px 0; color:var(--gold);">🔎 Pattern Search Engine</h3>
-        <div style="display:flex; gap:10px; align-items:center; flex-wrap:wrap;">
-            <span>Find Pattern:</span>
-            <input type="text" id="s1" placeholder="Jodi 1">
-            <input type="text" id="s2" placeholder="Jodi 2">
-            <input type="text" id="s3" placeholder="Jodi 3">
-            <button class="search-btn" onclick="manualSearch()">SEARCH RECORDS</button>
-        </div>
-        <div id="search-status" style="margin-top:10px; font-size:12px; color:var(--green-line);"></div>
-    </div>
-
     <div class="toolbar">
-        <input type="file" id="csv" style="display:none">
-        <button onclick="document.getElementById('csv').click()" style="background:#444; color:white;">📂 CSV</button>
-        <button onclick="addRow()" style="background:#444; color:white;">➕ ROW</button>
-        <button onclick="saveData()" style="background:#28a745; color:white;">💾 SAVE DATA</button>
-        <button onclick="clearData()" style="background:#dc3545; color:white;">🗑️ CLEAR</button>
+        <input type="file" id="csvInput" style="display:none" onchange="handleCSV(this)">
+        <button onclick="document.getElementById('csvInput').click()" style="background:#555; color:#fff;">📂 UPLOAD CSV</button>
+        <button onclick="addRow()" style="background:#444; color:#fff;">➕ ADD ROW</button>
+        <button onclick="saveData()" style="background:#28a745; color:#fff;">💾 SAVE</button>
+        <button onclick="clearData()" style="background:#dc3545; color:#fff;">🗑️ RESET</button>
     </div>
 
     <center>
-        <div class="table-container">
+        <div class="table-container" id="mainContainer">
             <canvas id="mainCanvas"></canvas>
             <table id="tbl"></table>
         </div>
     </center>
 
     <div class="dashboard">
-        <div class="card"><h3>✔ Matches Found</h3><div id="checks"></div></div>
-        <div class="card"><h3>🤖 AI Analysis</h3><div id="ai">Wait...</div></div>
-        <div class="card"><h3>🔮 Future Prediction</h3><div id="future">...</div></div>
+        <div class="card">
+            <h3>Check Lines</h3>
+            <div id="check-list">Click a blank cell to find patterns</div>
+        </div>
+        <div class="card">
+            <h3>AI Prediction</h3>
+            <div id="ai-res">...</div>
+        </div>
     </div>
 </div>
 
 <div class="overlay" id="overlay" onclick="closePopup()"></div>
 <div id="popup">
-    <button onclick="closePopup()" style="float:right; background:#000; color:white; padding:5px 10px;">CLOSE</button>
-    <h3 id="popTitle">Record Details</h3>
-    <div class="table-container" style="border: 1px solid #ddd; width:100%; overflow-x:auto;">
+    <h3 id="popTitle">Pattern Match</h3>
+    <div class="table-container" id="popContainer">
         <canvas id="popCanvas"></canvas>
         <div id="popData"></div>
     </div>
+    <button onclick="closePopup()" style="margin-top:15px; width:100%; background:#000; color:#fff;">CLOSE</button>
 </div>
 
 <script>
-// --- CORE DATA & LOGIC ---
-const STORAGE_KEY="pdata_Milan_v2";
 const families={"12":["12","17","21","26","62","67","71","76"],"13":["13","18","31","36","63","68","81","86"],"14":["14","19","41","46","64","69","91","96"],"15":["01","06","10","15","51","56","60","65"],"23":["23","28","32","37","73","78","82","87"],"24":["24","29","42","47","74","79","92","97"],"25":["02","07","20","25","52","57","70","75"],"34":["34","39","43","48","84","89","93","98"],"35":["03","08","30","35","53","58","80","85"],"45":["04","09","40","45","54","59","90","95"],"HR":["05","16","27","38","49","50","61","72","83","94"],"FR":["00","11","22","33","44","55","66","77","88","99"]};
 
-let data=JSON.parse(localStorage.getItem(STORAGE_KEY)) || [["51","91","41","57","19","95"],["05","90","74","06","19","63"],["90","34","82","09","28","19"],["**","**","**","**","**","**"]];
-let activeMark=null;
-let targetCol=null;
+let data = JSON.parse(localStorage.getItem("milan_v3")) || [["51","91","41","57","19","95"],["05","90","74","06","19","63"],["90","34","82","09","28","19"],["**","**","**","**","**","**"]];
+let activePattern = null;
 
-function startApp() { document.getElementById('home-screen').style.display = 'none'; document.getElementById('main-app').style.display = 'block'; draw(); }
-function fam(v){for(let k in families) if(families[k].includes(v)) return k; return "NA";}
-function palti(v){return v[1]+v[0];}
-function norm(v){if(!v || v=="**")return "**"; v=String(v); return v.length==1?"0"+v:v;}
-function smartMatch(a,b){ if(a=="**"||b=="**") return false; return a===b || palti(a)===b || fam(a)===fam(b); }
+function startApp() { document.getElementById('home-screen').style.display='none'; document.getElementById('main-app').style.display='block'; render(); }
 
-// --- DRAWING FUNCTIONS ---
-function draw(){
- let h="<tr><th>MON</th><th>TUE</th><th>WED</th><th>THU</th><th>FRI</th><th>SAT</th></tr>";
- data.forEach((r,ri)=>{
-  h+="<tr>";
-  r.forEach((c,ci)=>{
-   let cls = (activeMark && isPartOfPattern(ri, ci)) ? "circle" : "";
-   if(c=="**") cls += " blank";
-   h+=`<td class="${cls}" contenteditable oninput="edit(${ri},${ci},this)" onclick="${c=='**'?'makePattern('+ri+','+ci+')':'' }">${c}</td>`;
-  });
-  h+="</tr>";
- });
- document.getElementById("tbl").innerHTML=h;
- if(activeMark) setTimeout(() => drawLines("mainCanvas", document.getElementById("tbl")), 50);
-}
+function fam(v){ for(let k in families) if(families[k].includes(v)) return k; return null; }
+function norm(v){ v=String(v).trim(); if(v=="**" || !v) return "**"; return v.length==1?"0"+v:v; }
 
-function isPartOfPattern(ri, ci){
-    if(!activeMark) return false;
-    let i = ri - activeMark.start;
-    return (i >= 0 && i < activeMark.shape.length && activeMark.shape[i][ci]);
-}
-
-function drawLines(cvsId, tblEl) {
-    const cvs = document.getElementById(cvsId);
-    const ctx = cvs.getContext("2d");
-    cvs.width = tblEl.offsetWidth; cvs.height = tblEl.offsetHeight;
-    ctx.clearRect(0,0,cvs.width,cvs.height);
-    const cells = tblEl.querySelectorAll(".circle");
-    if(cells.length < 2) return;
-    const tRect = tblEl.getBoundingClientRect();
-    ctx.strokeStyle = "#00ff88"; ctx.lineWidth = 2.5; ctx.beginPath();
-    cells.forEach((c, idx) => {
-        const r = c.getBoundingClientRect();
-        const x = r.left - tRect.left + r.width/2;
-        const y = r.top - tRect.top + r.height/2;
-        if(idx === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
-    });
-    ctx.stroke();
-}
-
-// --- SEARCH ENGINE LOGIC (NEW) ---
-function manualSearch() {
-    let s1 = norm(document.getElementById('s1').value);
-    let s2 = norm(document.getElementById('s2').value);
-    let s3 = norm(document.getElementById('s3').value);
-    
-    if(s1=="**" || s2=="**") { alert("Enter at least 2 Jodis"); return; }
-    
-    let matches = [];
-    // Search in data for 1, 2, 3 sequence
-    for(let i=0; i < data.length - 2; i++) {
-        for(let j=0; j<6; j++) {
-            if(smartMatch(data[i][j], s1) && smartMatch(data[i+1][j], s2)) {
-                if(s3=="**" || (data[i+2] && smartMatch(data[i+2][j], s3))) {
-                    matches.push({row: i, col: j});
-                }
+function render() {
+    let h = "<tr><th>MON</th><th>TUE</th><th>WED</th><th>THU</th><th>FRI</th><th>SAT</th></tr>";
+    data.forEach((r, ri) => {
+        h += "<tr>";
+        r.forEach((c, ci) => {
+            let cls = "";
+            if(activePattern && ri >= activePattern.start && ri < activePattern.start + activePattern.shape.length) {
+                let cellData = activePattern.shape[ri - activePattern.start][ci];
+                if(cellData === 1) cls = "f1-mark";
+                if(cellData === 2) cls = "f2-mark";
             }
-        }
+            h += `<td class="${cls}" contenteditable oninput="updateData(${ri},${ci},this.innerText)" onclick="cellClick(${ri},${ci})">${c}</td>`;
+        });
+        h += "</tr>";
+    });
+    document.getElementById("tbl").innerHTML = h;
+    if(activePattern) setTimeout(() => drawPatternLines("mainCanvas", "tbl"), 50);
+}
+
+function cellClick(r, c) {
+    if(data[r][c] !== "**") return;
+    
+    // Scan last 8 rows for 2 families
+    let lookback = 8;
+    let counts = {};
+    for(let i = Math.max(0, r-lookback); i < r; i++) {
+        data[i].forEach(val => {
+            let f = fam(val);
+            if(f) counts[f] = (counts[f] || 0) + 1;
+        });
+    }
+
+    let sorted = Object.keys(counts).sort((a,b) => counts[b] - counts[a]);
+    if(sorted.length < 2) { alert("Not enough patterns in last 8 rows"); return; }
+    
+    let f1 = sorted[0], f2 = sorted[1];
+    let shape = [];
+    for(let i = Math.max(0, r-lookback); i < r; i++) {
+        let rowShape = data[i].map(val => fam(val) === f1 ? 1 : (fam(val) === f2 ? 2 : 0));
+        shape.push(rowShape);
     }
     
-    let status = document.getElementById('search-status');
-    status.innerText = matches.length + " Patterns Found in History!";
+    searchDualPattern(shape, r, c);
+}
+
+function searchDualPattern(shape, targetRow, targetCol) {
+    let matches = [];
+    for(let i = 0; i <= data.length - shape.length; i++) {
+        let score = 0;
+        shape.forEach((row, ri) => {
+            row.forEach((type, ci) => {
+                if(type === 1 && fam(data[i+ri][ci]) === fam(data[targetRow-shape.length+ri][ci])) score++;
+                if(type === 2 && fam(data[i+ri][ci]) === fam(data[targetRow-shape.length+ri][ci])) score++;
+            });
+        });
+        if(score > 3) matches.push({index: i, score: score});
+    }
     
-    // Show in Matches list
-    let list = document.getElementById("checks");
-    list.innerHTML = "<h4>Manual Matches:</h4>";
-    matches.forEach(m => {
-        let d = document.createElement("div");
-        d.className = "search-btn";
-        d.style = "margin-bottom:5px; background:#0084ff; color:white; font-size:11px; padding:5px;";
-        d.innerText = `Record Row ${m.row+1} | Col ${m.col+1}`;
-        d.onclick = () => showSearchInPopup(m.row, m.col);
-        list.appendChild(d);
+    displayMatches(matches, shape, targetCol);
+}
+
+function displayMatches(matches, shape, targetCol) {
+    let list = document.getElementById("check-list");
+    list.innerHTML = "<h4>Matches Found:</h4>";
+    matches.forEach((m, idx) => {
+        let btn = document.createElement("div");
+        btn.style = "background:#334155; padding:10px; margin:5px 0; border-radius:5px; cursor:pointer; border-left:4px solid var(--cyan)";
+        btn.innerText = `Check Line ${idx + 1} (Row ${m.index + 1})`;
+        btn.onclick = () => {
+            activePattern = {start: m.index, shape: shape};
+            render();
+            showPopupMatch(m.index, shape);
+        };
+        list.appendChild(btn);
     });
 }
 
-function showSearchInPopup(r, c) {
+function drawPatternLines(cvsId, tblId) {
+    const cvs = document.getElementById(cvsId);
+    const tbl = document.getElementById(tblId);
+    const ctx = cvs.getContext("2d");
+    cvs.width = tbl.offsetWidth; cvs.height = tbl.offsetHeight;
+    ctx.clearRect(0,0,cvs.width,cvs.height);
+
+    const drawFor = (cls, color) => {
+        let cells = tbl.querySelectorAll("." + cls);
+        ctx.strokeStyle = color; ctx.lineWidth = 2; ctx.beginPath();
+        cells.forEach((c, i) => {
+            let r = c.getBoundingClientRect();
+            let tr = tbl.getBoundingClientRect();
+            let x = r.left - tr.left + r.width/2;
+            let y = r.top - tr.top + r.height/2;
+            if(i===0) ctx.moveTo(x,y); else ctx.lineTo(x,y);
+        });
+        ctx.stroke();
+    };
+    drawFor("f1-mark", "#ffd700");
+    drawFor("f2-mark", "#00f2ff");
+}
+
+function showPopupMatch(start, shape) {
     let html = "<table>";
-    // Show 5 weeks around the match
-    let start = Math.max(0, r-2);
-    let end = Math.min(data.length-1, r+3);
-    
-    for(let i=start; i<=end; i++) {
+    for(let i = start; i < start + shape.length + 1; i++) {
+        if(!data[i]) break;
         html += "<tr>";
-        data[i].forEach((val, colIdx) => {
-            let cls = (colIdx === c && i >= r && i <= r+2) ? "circle" : "";
-            html += `<td class="${cls}">${val}</td>`;
+        data[i].forEach((v, ci) => {
+            let cls = "";
+            if(i < start + shape.length) {
+                if(shape[i-start][ci] === 1) cls = "f1-mark";
+                if(shape[i-start][ci] === 2) cls = "f2-mark";
+            }
+            html += `<td class="${cls}">${v}</td>`;
         });
         html += "</tr>";
     }
     document.getElementById("popData").innerHTML = html + "</table>";
-    document.getElementById("popup").style.display="block";
-    document.getElementById("overlay").style.display="block";
-    setTimeout(()=>drawLines("popCanvas", document.getElementById("popData").querySelector('table')), 100);
+    document.getElementById("overlay").style.display = "block";
+    document.getElementById("popup").style.display = "block";
+    setTimeout(() => drawPatternLines("popCanvas", "popData"), 100);
 }
 
-// --- ORIGINAL BUTTON FUNCTIONS ---
-function edit(r,c,el){ data[r][c]=norm(el.innerText.trim()); }
-function addRow(){ data.push(["**","**","**","**","**","**"]); draw(); }
-function saveData(){ localStorage.setItem(STORAGE_KEY,JSON.stringify(data)); alert("Saved!"); }
-function clearData(){ if(confirm("Clear All?")){ localStorage.clear(); location.reload(); }}
+function updateData(r,c,v){ data[r][c] = norm(v); }
+function addRow(){ data.push(["**","**","**","**","**","**"]); render(); }
+function saveData(){ localStorage.setItem("milan_v3", JSON.stringify(data)); alert("Data Saved!"); }
+function clearData(){ if(confirm("Clear everything?")){ localStorage.clear(); location.reload(); } }
+function closePopup(){ document.getElementById("overlay").style.display="none"; document.getElementById("popup").style.display="none"; }
 
-function makePattern(r,c){
-    targetCol=c; let base="**";
-    for(let i=r-1;i>=0;i--){ if(data[i][c]!="**"){base=data[i][c]; break;}}
-    if(base=="**") return;
-    let shape=[];
-    for(let i=Math.max(0,r-4);i<r;i++){
-        let row=[];
-        for(let j=0;j<6;j++){ row.push(data[i][j]!="**" && smartMatch(data[i][j],base)?1:0); }
-        shape.push(row);
-    }
-    searchPattern(shape,base);
+function handleCSV(input) {
+    const reader = new FileReader();
+    reader.onload = function() {
+        const rows = reader.result.split('\n').map(row => row.split(',').map(cell => norm(cell.trim())));
+        data = rows.filter(r => r.length >= 6);
+        render();
+    };
+    reader.readAsText(input.files[0]);
 }
-
-function searchPattern(shape,base){
-    let matches=[];
-    for(let i=0; i<=data.length-shape.length; i++){
-        let ok=true;
-        for(let k=0; k<shape.length; k++){
-            for(let j=0; j<6; j++){ if(shape[k][j] && !smartMatch(data[i+k][j],base)){ok=false; break;}}
-            if(!ok) break;
-        }
-        if(ok) matches.push({index:i});
-    }
-    showChecks(shape, matches);
-}
-
-function showChecks(shape, matches){
-    let div = document.getElementById("checks");
-    div.innerHTML="<h4>Found Patterns:</h4>";
-    matches.forEach(m=>{
-        let d = document.createElement("div");
-        d.style = "background:#2a2a2a; margin:5px 0; padding:8px; cursor:pointer; border-radius:6px; font-size:12px; border-left:3px solid #0084ff;";
-        d.innerText = `Sequence Match: Row ${m.index + 1}`;
-        d.onclick = () => { activeMark={start:m.index, shape:shape}; draw(); };
-        div.appendChild(d);
-    });
-    updateAI(shape, matches);
-}
-
-function updateAI(shape, matches){
-    let pool = [];
-    matches.forEach(m => {
-        let nextR = m.index + shape.length;
-        if(nextR < data.length && data[nextR][targetCol] != "**") pool.push(data[nextR][targetCol]);
-    });
-    document.getElementById("future").innerHTML = pool.length ? `<b>Probable Next:</b> ${[...new Set(pool)].join(" , ")}` : "No direct matches found.";
-}
-
-function closePopup(){ document.getElementById("popup").style.display="none"; document.getElementById("overlay").style.display="none"; }
 </script>
 </body>
-  </html>
+</html>
