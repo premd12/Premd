@@ -173,40 +173,63 @@ function addRow(){ data.push(["**","**","**","**","**"]); draw(); }
 function saveData(){ localStorage.setItem(STORAGE_KEY,JSON.stringify(data)); alert("Saved!"); }
 function clearData(){ if(confirm("Clear All?")){ localStorage.clear(); location.reload(); }}
 
+// --- Updated makePattern Function for Dynamic Detection ---
+
 function makePattern(r, c) {
-    targetCol = c;
+    targetCol = c; // Jis column me click kiya, prediction wahi hogi
     let b1 = "**", b2 = "**";
-    let b1Count = 0, b2Count = 0;
+    let b1Pos = [], b2Pos = [];
 
-    // 1. Scan 10 rows for 2 different families (Limit each family to 2 Jodis)
-    let patternShape = Array(11).fill().map(() => Array(5).fill(0));
-    let startR = Math.max(0, r - 10);
-
-    for (let i = r; i >= startR; i--) {
+    // 1. Scan up to 12 rows above the clicked cell
+    let startR = Math.max(0, r - 12);
+    
+    // Sabse pehle upar ki taraf jodi dhundna shuru karte hain
+    for (let i = r - 1; i >= startR; i--) {
         for (let j = 0; j < 5; j++) {
             let val = data[i][j];
             if (val !== "**") {
-                if (b1 === "**") { b1 = val; b1Count = 1; patternShape[i - startR][j] = 1; }
-                else if (smartMatch(val, b1) && b1Count < 2) { b1Count++; patternShape[i - startR][j] = 1; }
-                else if (b2 === "**" && fam(val) !== fam(b1)) { b2 = val; b2Count = 1; patternShape[i - startR][j] = 2; }
-                else if (b2 !== "**" && smartMatch(val, b2) && b2Count < 2) { b2Count++; patternShape[i - startR][j] = 2; }
+                let currentFam = fam(val);
+                
+                // Pehli Family (Red)
+                if (b1 === "**") {
+                    b1 = val;
+                    b1Pos.push({r: i, c: j});
+                } else if (fam(val) === fam(b1) && b1Pos.length < 2) {
+                    b1Pos.push({r: i, c: j});
+                } 
+                // Dusri Family (Blue)
+                else if (b2 === "**" && currentFam !== fam(b1)) {
+                    b2 = val;
+                    b2Pos.push({r: i, c: j});
+                } else if (b2 !== "**" && currentFam === fam(b2) && b2Pos.length < 2) {
+                    b2Pos.push({r: i, c: j});
+                }
             }
         }
     }
 
-    if (b1Count < 2 || b2Count < 2) {
-        alert("Pattern not found! Need at least 2 jodis of 2 different families in last 10 rows.");
+    if (b1Pos.length < 2 || b2Pos.length < 2) {
+        alert("Is cell ke upar paryapt (enough) pattern nahi mila. Kam se kam 2 different families ki 2-2 jodi honi chahiye.");
         return;
     }
 
-    // Trim empty rows from shape
-    let finalShape = patternShape.slice(0, r - startR + 1);
-    searchMultiPattern(finalShape, b1, b2);
+    // 2. Create a Relative Shape Map
+    // Hum pattern ki height nikalte hain (Sabse upar wali jodi se clicked cell tak)
+    let topMost = Math.min(b1Pos[b1Pos.length-1].r, b2Pos[b2Pos.length-1].r);
+    let shapeHeight = r - topMost;
+    let shape = Array(shapeHeight).fill().map(() => Array(5).fill(0));
+
+    b1Pos.forEach(p => { shape[p.r - topMost][p.c] = 1; });
+    b2Pos.forEach(p => { shape[p.r - topMost][p.c] = 2; });
+
+    // 3. Purane matches clear karke naye dhundna
+    searchMultiPattern(shape, b1, b2);
 }
 
 function searchMultiPattern(shape, b1, b2) {
     let matches = [];
-    for (let i = 0; i <= data.length - shape.length; i++) {
+    // Pure record me ye 'shape' dhundna (History Search)
+    for (let i = 0; i <= data.length - shape.length - 1; i++) {
         let ok = true;
         for (let k = 0; k < shape.length; k++) {
             for (let j = 0; j < 5; j++) {
@@ -216,11 +239,19 @@ function searchMultiPattern(shape, b1, b2) {
             }
             if (!ok) break;
         }
-        if (ok) matches.push({ index: i });
+        
+        // Agar pattern match ho gaya, to dekho uske niche prediction wali jodi available hai ya nahi
+        if (ok) {
+            matches.push({ index: i });
+        }
     }
-    showChecks(shape, matches, b1, b2);
+    
+    if(matches.length === 0) {
+        document.getElementById("checks").innerHTML = "<p style='font-size:12px; opacity:0.6;'>History me aisa koi pattern nahi mila.</p>";
+    } else {
+        showChecks(shape, matches, b1, b2);
+    }
 }
-
 function showChecks(shape, matches, b1, b2){
     const container = document.getElementById("checks");
     container.innerHTML = "";
